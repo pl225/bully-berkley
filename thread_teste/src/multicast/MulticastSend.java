@@ -1,12 +1,12 @@
-package thread_teste;
+package multicast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+
+import thread_teste.Mensagem;
 
 public class MulticastSend extends Multicast implements Runnable {
 
@@ -19,13 +19,6 @@ public class MulticastSend extends Multicast implements Runnable {
 			this.dgramSocket = new DatagramSocket();
 		} catch (IOException ioe){
 			System.out.println("problems creating the datagram socket.");
-			System.exit(1);
-		}
-
-		try {
-			this.localHost = InetAddress.getLocalHost();
-		} catch (UnknownHostException uhe) {
-			System.out.println("Problems identifying local host");
 			System.exit(1);
 		}
 	}

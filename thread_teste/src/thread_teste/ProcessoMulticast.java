@@ -1,5 +1,7 @@
 package thread_teste;
 
+import multicast.MulticastReceiver;
+import multicast.MulticastSend;
 import thread_teste.Mensagem.TipoMensagem;
 
 public class ProcessoMulticast extends Processo {

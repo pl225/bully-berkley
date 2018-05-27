@@ -1,11 +1,12 @@
-package thread_teste;
+package multicast;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 
-import thread_teste.Mensagem.TipoMensagem;
+import thread_teste.Mensagem;
+import thread_teste.Processo;
 
 public class MulticastReceiver extends Multicast {
 	

@@ -1,4 +1,4 @@
-package thread_teste;
+package multicast;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,7 +27,6 @@ public abstract class Multicast implements Runnable {
 	
 	protected void juntarAoGrupo () {
 		try {
-			localHost = InetAddress.getLocalHost();
 			mSocket = new MulticastSocket(PORT);
 			mSocket.joinGroup(mcastAddr);
 		} catch (UnknownHostException e) {

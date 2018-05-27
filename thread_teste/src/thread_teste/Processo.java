@@ -35,9 +35,9 @@ public abstract class Processo {
 		this.isAtualizandoRelogio = false;
 		this.relogioLocal = 0;
 		this.intervaloAtualizacao = new Random().nextInt(1000);
+		this.portaUnicast += pid;
 		this.threadRecepcao = this.iniciarThreadRecepcao();
 		this.threadRecepcao.start();
-		this.portaUnicast += pid;
 	}
 	
 	public synchronized void iniciarAtualizacaoRelogio () {
@@ -109,5 +109,8 @@ public abstract class Processo {
 				
 			});	
 		}
+	}
+	public int getPorta() {
+		return this.portaUnicast;
 	}
 }

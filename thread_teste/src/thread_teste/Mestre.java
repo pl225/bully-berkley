@@ -71,6 +71,6 @@ public class Mestre {
 		/*Chat m = new Mestre.Chat();
 		new T1(m);
 		new T2(m);*/
-		new Sistema(5, TipoProcesso.MULTICAST).iniciarProcessos();
+		new Sistema(5, TipoProcesso.BROADCAST).iniciarProcessos();
 	}
 }

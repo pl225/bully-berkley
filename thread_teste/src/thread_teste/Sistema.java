@@ -16,7 +16,15 @@ public class Sistema {
 		this.N = N;
 		if (tipoProcesso == TipoProcesso.MULTICAST)
 			this.piscina = this.gerarProcessosMulticast();
-		/*else gerarProcessosBroadcast*/
+		else 
+			this.piscina = this.gerarProcessosBroadcast();
+	}
+
+	private List<Processo> gerarProcessosBroadcast() {
+		List<Processo> processos = new ArrayList<Processo>();
+		for (int i = 0; i < this.N; i++)
+			processos.add(new ProcessoBroadcast(i));
+		return processos;
 	}
 
 	private List<Processo> gerarProcessosMulticast() {
