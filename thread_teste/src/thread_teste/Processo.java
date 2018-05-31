@@ -47,7 +47,7 @@ public abstract class Processo {
 			@Override
 			public void run() {
 
-				while (isAtualizandoRelogio) {
+				while (Processo.this.isAtualizandoRelogio) {
 					try {
 						Thread.sleep(Processo.this.intervaloAtualizacao);
 					} catch (InterruptedException e) {
@@ -55,9 +55,9 @@ public abstract class Processo {
 						System.exit(0);
 					}
 					Processo.this.relogioLocal++;
-					System.out.println("PID: " + pid + ", R: " + relogioLocal);
+					System.out.println("PID: " + Processo.this.pid + ", R: " + Processo.this.relogioLocal);
 					
-					if (relogioLocal == 1) // apenas para teste
+					if (Processo.this.relogioLocal == 1) // apenas para teste
 						enviarMsgProcessos(TipoMensagem.ELEICAO);
 				}
 			}

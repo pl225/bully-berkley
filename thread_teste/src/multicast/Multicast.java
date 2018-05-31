@@ -7,17 +7,17 @@ import java.net.UnknownHostException;
 
 public abstract class Multicast implements Runnable {
 	
-	protected static String ADDRESS = "224.0.0.255"; // endereco multicast valido 224.0.0.0 to 224.0.0.255	
-	protected static int PORT = 6000;
+	protected static final String ADDRESS = "224.0.0.255"; // endereco multicast valido 224.0.0.0 to 224.0.0.255	
+	protected static final int PORT = 6000;
 	protected static InetAddress mcastAddr;
 	
 	protected InetAddress localHost;
 	protected MulticastSocket mSocket;
 	
 	public Multicast () {
-		if (mcastAddr == null) {
+		if (Multicast.mcastAddr == null) {
 			try {
-				mcastAddr = InetAddress.getByName(ADDRESS);
+				Multicast.mcastAddr = InetAddress.getByName(Multicast.ADDRESS);
 			} catch (UnknownHostException e) {
 				System.out.println("Problems getting the symbolic multicast address");
 			    System.exit(0);
@@ -27,8 +27,8 @@ public abstract class Multicast implements Runnable {
 	
 	protected void juntarAoGrupo () {
 		try {
-			mSocket = new MulticastSocket(PORT);
-			mSocket.joinGroup(mcastAddr);
+			this.mSocket = new MulticastSocket(Multicast.PORT);
+			this.mSocket.joinGroup(Multicast.mcastAddr);
 		} catch (UnknownHostException e) {
 			System.out.println("Problems identifying local host");
 			System.exit(0);
