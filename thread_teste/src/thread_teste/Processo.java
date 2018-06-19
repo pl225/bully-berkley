@@ -76,8 +76,8 @@ public abstract class Processo {
 		if (mensagem.getTipoMensagem() == TipoMensagem.ELEICAO) { // verificar mais seguranca para nao executar bully mais de uma vez
 			this.iniciarEsperaBully();
         	if (this.pid >= mensagem.getPidOrigem()) {
-        		// enviar ok para o processo pid da mensagem
-        		// enviar msg eleicao para todo mundo
+        		//enviar ok para o processo pid da mensagem
+        		//enviar msg eleicao para todo mundo
         	} else {
         		this.setEstouNaDisputaBully(false);
         	}

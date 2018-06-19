@@ -35,7 +35,7 @@ public class BroadcastReceiver extends Broadcast {
 	
 	        Mensagem mensagem = (Mensagem) ois.readObject();
 	
-	        //if (!(packet.getAddress().equals(localHost))) {
+	        if (mensagem.getPidOrigem() != this.processo.getId())
 	          System.out.println("Processo " + this.processo.getId() + " received broadcast packet: " + mensagem + " from: " + packet.getAddress());
 	        //} 
 	          
