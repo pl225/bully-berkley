@@ -7,9 +7,11 @@ public class Mensagem implements Serializable{
 	private int pidOrigem;
 	private TipoMensagem tipoMensagem;
 	private int portaPid;
+	private long relogio;
+	private Long ajuste;
 	
 	public enum TipoMensagem {
-		ELEICAO, OK, COORDENADOR, BERKLEY
+		ELEICAO, OK, COORDENADOR, BERKLEY, BERKLEY_CALCULO, BERKLEY_FIM
 	}
 	
 	public Mensagem (int pid, int portaPid, TipoMensagem tipoMensagem) {
@@ -33,6 +35,22 @@ public class Mensagem implements Serializable{
 
 	public int getPortaPid() {
 		return this.portaPid;
+	}
+
+	public void setRelogio(long relogioLocal) {
+		this.relogio = relogioLocal;
+	}
+
+	public long getRelogio() {
+		return this.relogio;
+	}
+
+	public void setAjuste(Long value) {
+		this.ajuste = value;
+	}
+
+	public long getAjuste() {
+		return this.ajuste;
 	}
 	
 	

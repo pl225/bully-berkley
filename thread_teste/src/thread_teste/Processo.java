@@ -1,5 +1,6 @@
 package thread_teste;
 
+import java.util.Map.Entry;
 import java.util.Random;
 
 import thread_teste.Mensagem.TipoMensagem;
@@ -16,6 +17,8 @@ public abstract class Processo {
 	private boolean estouNaDisputaBully; // flag que diz se o processo esta na disputa do bully
 	private Thread aguardandoResultadoBully; // thread ativa para aguardar resultado da disputa do bully
 	protected int portaUnicast = 7000; // porta para envio/recepcao de mensagens especificas para esse processo
+	private int portaUnicastLider;
+	private Berkley berkley;
 	
 	protected abstract Thread iniciarThreadRecepcao ();
 	protected abstract void enviarMsgProcessos (TipoMensagem tipoMensagem);
@@ -86,12 +89,29 @@ public abstract class Processo {
         	System.out.println("Processo: " + this.pid + " não estou mais na disputa");
         	this.setEstouNaDisputaBully(false);
         } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY) {
-        	
+        	this.enviarHorarioAtual();
+        } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY_CALCULO) {
+        	this.berkley.addHorarioEscravo(mensagem.getPortaPid(), mensagem.getRelogio());
+        } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY_FIM) {
+        	this.relogioLocal += mensagem.getAjuste();
+        	this.imprimirRelogioLocal();
         } else { // COORDENADOR
-        	// conheco o lider
+        	this.portaUnicastLider = mensagem.getPortaPid();
+        	this.isAtualizandoRelogio = false;
         }
 	}
 
+	private void enviarHorarioAtual() {
+		Mensagem m = new Mensagem(pid, portaUnicast, TipoMensagem.BERKLEY_CALCULO);
+		this.isAtualizandoRelogio = false;
+		m.setRelogio(this.relogioLocal);
+		this.imprimirRelogioLocal();
+		new Thread(new UnicastSend(m, this.portaUnicastLider)).start();
+	}
+	
+	private void imprimirRelogioLocal() {
+		System.out.println("Processo " + this.pid + ", relógio atual: " + this.relogioLocal);
+	}
 	private void iniciarEsperaBully() {
 		if (this.aguardandoResultadoBully == null) {
 			this.setEstouNaDisputaBully(true);
@@ -108,6 +128,7 @@ public abstract class Processo {
 					if (Processo.this.estouNaDisputaBully) { // dps do tempo, se ainda estou na disputa, sou o lider
 						Processo.this.enviarMsgProcessos(TipoMensagem.COORDENADOR);
 						System.out.println("Processo:" + Processo.this.pid + " sou o líder.");
+						Processo.this.iniciarSincronizacaoBerkley();
 					}
 				}
 				
@@ -115,6 +136,42 @@ public abstract class Processo {
 			this.aguardandoResultadoBully.start();
 		}
 	}
+	
+	protected void iniciarSincronizacaoBerkley() {
+		this.enviarMsgProcessos(TipoMensagem.BERKLEY);
+		this.isAtualizandoRelogio = false;
+		this.imprimirRelogioLocal();
+		this.berkley = new Berkley(this.portaUnicast, this.relogioLocal);
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					System.out.println(e.getMessage());
+					System.exit(0);
+				}
+				
+				Processo.this.berkley.calcularNovosHorarios();
+				
+				Processo.this.relogioLocal += Processo.this.berkley.getAjusteLider();
+				Processo.this.imprimirRelogioLocal();
+				for (Entry<Integer, Long> ajusteProcesso : Processo.this.berkley.getAjustesEscravos())
+					Processo.this.enviarAjusteEscravos(ajusteProcesso.getKey(), ajusteProcesso.getValue());
+			}
+
+		}).start();
+		
+	}
+	
+	protected void enviarAjusteEscravos(Integer key, Long value) {
+		Mensagem m = new Mensagem(pid, portaUnicast, TipoMensagem.BERKLEY_FIM);
+		m.setAjuste(value);
+		new Thread(new UnicastSend(m, key)).start();
+	}
+	
 	public int getPorta() {
 		return this.portaUnicast;
 	}
