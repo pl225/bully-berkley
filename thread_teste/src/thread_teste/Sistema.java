@@ -2,6 +2,7 @@ package thread_teste;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Sistema {
 	
@@ -41,5 +42,10 @@ public class Sistema {
 	public void iniciarProcessos () {
 		for (Processo p : this.piscina)
 			p.iniciarAtualizacaoRelogio();
+	}
+
+	public void iniciarEleicao() {
+		Processo p = this.getProcessos().get(new Random().nextInt(this.getProcessos().size()));
+		p.iniciarEleicao();
 	}
 }

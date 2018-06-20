@@ -30,6 +30,10 @@ public class Mensagem implements Serializable{
 	public String toString() {
 		return "Mensagem [pidOrigem=" + pidOrigem + ", tipoMensagem=" + tipoMensagem + "]";
 	}
+
+	public int getPortaPid() {
+		return this.portaPid;
+	}
 	
 	
 }

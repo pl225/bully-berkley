@@ -42,11 +42,10 @@ public class UnicastReceiver extends Unicast {
 
 				Mensagem mensagem = (Mensagem) ois.readObject();
 
-				if (mensagem.getPidOrigem() != this.processo.getId())
+				if (mensagem.getPidOrigem() != this.processo.getId()) {
 					System.out.println("Processo " + this.processo.getId() + " received unicast packet: " + mensagem + " from: " + packet.getAddress());
-				//} this.p
-
-				this.processo.executarAlgoritmo(mensagem);
+					this.processo.executarAlgoritmo(mensagem);
+				}
 
 				ois.close();
 				bistream.close();

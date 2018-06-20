@@ -3,6 +3,8 @@ package thread_teste;
 import java.util.Random;
 
 import thread_teste.Mensagem.TipoMensagem;
+import unicast.UnicastReceiver;
+import unicast.UnicastSend;
 
 public abstract class Processo {
 	
@@ -13,7 +15,7 @@ public abstract class Processo {
 	private Thread threadRecepcao; // thread sempre ativa para a recepção de msgs 
 	private boolean estouNaDisputaBully; // flag que diz se o processo esta na disputa do bully
 	private Thread aguardandoResultadoBully; // thread ativa para aguardar resultado da disputa do bully
-	protected int portaUnicast = 6000; // porta para envio/recepcao de mensagens especificas para esse processo
+	protected int portaUnicast = 7000; // porta para envio/recepcao de mensagens especificas para esse processo
 	
 	protected abstract Thread iniciarThreadRecepcao ();
 	protected abstract void enviarMsgProcessos (TipoMensagem tipoMensagem);
@@ -38,6 +40,7 @@ public abstract class Processo {
 		this.portaUnicast += pid;
 		this.threadRecepcao = this.iniciarThreadRecepcao();
 		this.threadRecepcao.start();
+		new Thread(new UnicastReceiver(this)).start();
 	}
 	
 	public synchronized void iniciarAtualizacaoRelogio () {
@@ -55,10 +58,7 @@ public abstract class Processo {
 						System.exit(0);
 					}
 					Processo.this.relogioLocal++;
-					System.out.println("PID: " + Processo.this.pid + ", R: " + Processo.this.relogioLocal);
-					
-					if (Processo.this.relogioLocal == 1) // apenas para teste
-						enviarMsgProcessos(TipoMensagem.ELEICAO);
+					//System.out.println("PID: " + Processo.this.pid + ", R: " + Processo.this.relogioLocal);
 				}
 			}
 		}).start();
@@ -66,22 +66,24 @@ public abstract class Processo {
 	
 	public void iniciarEleicao () {
 		this.enviarMsgProcessos(TipoMensagem.ELEICAO);
+		this.iniciarEsperaBully();
 	}
 	
 	public synchronized void enviarOK (Mensagem mensagem) {
-		//this.setEstouNaDisputaBully(false);
+		new Thread(new UnicastSend(new Mensagem(this.pid, this.portaUnicast, TipoMensagem.OK), mensagem.getPortaPid())).start();
 	}
 	
 	public synchronized void executarAlgoritmo(Mensagem mensagem) {
 		if (mensagem.getTipoMensagem() == TipoMensagem.ELEICAO) { // verificar mais seguranca para nao executar bully mais de uma vez
-			this.iniciarEsperaBully();
-        	if (this.pid >= mensagem.getPidOrigem()) {
-        		//enviar ok para o processo pid da mensagem
-        		//enviar msg eleicao para todo mundo
+        	if (this.pid > mensagem.getPidOrigem()) {
+        		this.iniciarEsperaBully();
+        		this.enviarOK(mensagem);
+        		this.iniciarEleicao();
         	} else {
         		this.setEstouNaDisputaBully(false);
         	}
         } else if (mensagem.getTipoMensagem() == TipoMensagem.OK) {
+        	System.out.println("Processo: " + this.pid + " não estou mais na disputa");
         	this.setEstouNaDisputaBully(false);
         } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY) {
         	
@@ -92,22 +94,25 @@ public abstract class Processo {
 
 	private void iniciarEsperaBully() {
 		if (this.aguardandoResultadoBully == null) {
+			this.setEstouNaDisputaBully(true);
 			this.aguardandoResultadoBully = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					try {
-						Thread.sleep(10000); // tempo arbitrario, decidir
+						Thread.sleep(2500); // tempo arbitrario, decidir
 					} catch (InterruptedException e) {
 						System.out.println(e.getMessage());
 						System.exit(0);
 					}
 					if (Processo.this.estouNaDisputaBully) { // dps do tempo, se ainda estou na disputa, sou o lider
 						Processo.this.enviarMsgProcessos(TipoMensagem.COORDENADOR);
+						System.out.println("Processo:" + Processo.this.pid + " sou o líder.");
 					}
 				}
 				
 			});	
+			this.aguardandoResultadoBully.start();
 		}
 	}
 	public int getPorta() {
