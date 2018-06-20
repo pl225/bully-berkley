@@ -2,18 +2,16 @@ package thread_teste;
 
 import java.util.Scanner;
 
-import thread_teste.Sistema.TipoProcesso;
-
 public class Mestre {
 	public static void main(String[] args) {
-		Sistema s = new Sistema(5, TipoProcesso.MULTICAST);
-		s.iniciarProcessos();
+		Processo p = new ProcessoBroadcast(2); // o id do processo deverá ser mudado a cada execução
+		
 		Scanner scanner = new Scanner(System.in);
 		
 		System.out.println("Pressione um número para começar...");
 		scanner.nextInt();
 		
-		s.iniciarEleicao();
+		p.iniciarEleicao();
 		
 		scanner.close();
 	}
