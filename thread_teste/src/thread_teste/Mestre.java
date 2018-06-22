@@ -4,7 +4,9 @@ import java.util.Scanner;
 
 public class Mestre {
 	public static void main(String[] args) {
-		Processo p = new ProcessoBroadcast(3); // o id do processo deverá ser mudado a cada execução
+		Processo p = new ProcessoBroadcast(15); // o id do processo deverá ser mudado a cada execução
+		System.out.println("O processo " + p.getId() + " está rodando...");
+		
 		p.iniciarAtualizacaoRelogio();
 		
 		Scanner scanner = new Scanner(System.in);
