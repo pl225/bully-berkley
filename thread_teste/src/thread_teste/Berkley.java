@@ -8,14 +8,12 @@ import java.util.Set;
 public class Berkley {
 	
 	private HashMap<Integer, Long> mapaHorarios;
-	private long relogioLider;
 	private int portaLider;
 	
-	public Berkley(int portaLider, long relogio) {
-		this.relogioLider = relogio;
+	public Berkley(int portaLider) {
 		this.portaLider = portaLider;
 		this.mapaHorarios = new HashMap<>();
-		this.mapaHorarios.put(portaLider, relogio);
+		this.mapaHorarios.put(portaLider, 0L);
 	}
 
 	public void addHorarioEscravo(int portaPid, long relogio) {
@@ -26,14 +24,12 @@ public class Berkley {
 		long soma = 0;
 		
 		for (Map.Entry<Integer, Long> entry : this.mapaHorarios.entrySet())
-			soma += entry.getValue() - this.relogioLider;
+			soma += entry.getValue();
 
-		long media = soma / this.mapaHorarios.size();
-		
-		final long horarioFinal = this.relogioLider + media;
+		final long media = soma / this.mapaHorarios.size();
 		
 		this.mapaHorarios.replaceAll((k, v) -> {
-			return horarioFinal - v;
+			return media - v;
 		});
 	}
 	
@@ -46,9 +42,9 @@ public class Berkley {
 	}
 	
 	/*public static void main(String[] args) {
-		Berkley b = new Berkley (1, 60);
-		b.addHorarioEscravo(2, 50);
-		b.addHorarioEscravo(3, 85);
+		Berkley b = new Berkley (1, 0);
+		b.addHorarioEscravo(2, -10);
+		b.addHorarioEscravo(3, 25);
 		
 		b.calcularNovosHorarios();
 		

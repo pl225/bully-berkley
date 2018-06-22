@@ -16,8 +16,8 @@ public class ProcessoMulticast extends Processo {
 	}
 
 	@Override
-	protected void enviarMsgProcessos(TipoMensagem tipoMensagem) {
-		new Thread(new MulticastSend(new Mensagem(this.pid, this.portaUnicast, tipoMensagem))).start();
+	protected void enviarMsgProcessos(Mensagem mensagem) {
+		new Thread(new MulticastSend(mensagem)).start();
 	}
 	
 }

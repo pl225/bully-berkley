@@ -21,7 +21,7 @@ public abstract class Processo {
 	private Berkley berkley;
 	
 	protected abstract Thread iniciarThreadRecepcao ();
-	protected abstract void enviarMsgProcessos (TipoMensagem tipoMensagem);
+	protected abstract void enviarMsgProcessos (Mensagem mensagem);
 	
 	public boolean isEstouNaDisputaBully() {
 		return estouNaDisputaBully;
@@ -68,7 +68,7 @@ public abstract class Processo {
 	}
 	
 	public void iniciarEleicao () {
-		this.enviarMsgProcessos(TipoMensagem.ELEICAO);
+		this.enviarMsgProcessos(new Mensagem(this.pid, this.portaUnicast, TipoMensagem.ELEICAO));
 		this.iniciarEsperaBully();
 	}
 	
@@ -89,9 +89,9 @@ public abstract class Processo {
         	System.out.println("Processo: " + this.pid + " não estou mais na disputa");
         	this.setEstouNaDisputaBully(false);
         } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY) {
-        	this.enviarHorarioAtual();
+        	this.enviarDefasagem(mensagem);
         } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY_CALCULO) {
-        	this.berkley.addHorarioEscravo(mensagem.getPortaPid(), mensagem.getRelogio());
+        	this.berkley.addHorarioEscravo(mensagem.getPortaPid(), mensagem.getAjuste());
         } else if (mensagem.getTipoMensagem() == TipoMensagem.BERKLEY_FIM) {
         	this.relogioLocal += mensagem.getAjuste();
         	this.imprimirRelogioLocal();
@@ -101,10 +101,10 @@ public abstract class Processo {
         }
 	}
 
-	private void enviarHorarioAtual() {
-		Mensagem m = new Mensagem(pid, portaUnicast, TipoMensagem.BERKLEY_CALCULO);
+	private void enviarDefasagem(Mensagem mensagem) {
 		this.isAtualizandoRelogio = false;
-		m.setRelogio(this.relogioLocal);
+		Mensagem m = new Mensagem(pid, portaUnicast, TipoMensagem.BERKLEY_CALCULO);
+		m.setAjuste(this.relogioLocal - mensagem.getRelogio());
 		this.imprimirRelogioLocal();
 		new Thread(new UnicastSend(m, this.portaUnicastLider)).start();
 	}
@@ -126,7 +126,8 @@ public abstract class Processo {
 						System.exit(0);
 					}
 					if (Processo.this.estouNaDisputaBully) { // dps do tempo, se ainda estou na disputa, sou o lider
-						Processo.this.enviarMsgProcessos(TipoMensagem.COORDENADOR);
+						Processo.this.enviarMsgProcessos(new Mensagem(Processo.this.pid, 
+								Processo.this.portaUnicast, TipoMensagem.COORDENADOR));
 						System.out.println("Processo:" + Processo.this.pid + " sou o líder.");
 						Processo.this.iniciarSincronizacaoBerkley();
 					}
@@ -138,10 +139,12 @@ public abstract class Processo {
 	}
 	
 	protected void iniciarSincronizacaoBerkley() {
-		this.enviarMsgProcessos(TipoMensagem.BERKLEY);
 		this.isAtualizandoRelogio = false;
+		Mensagem msg = new Mensagem(this.pid, this.portaUnicast, TipoMensagem.BERKLEY);
+		msg.setRelogio(relogioLocal);
+		this.enviarMsgProcessos(msg);
 		this.imprimirRelogioLocal();
-		this.berkley = new Berkley(this.portaUnicast, this.relogioLocal);
+		this.berkley = new Berkley(this.portaUnicast);
 		
 		new Thread(new Runnable() {
 			

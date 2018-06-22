@@ -16,8 +16,8 @@ public class ProcessoBroadcast extends Processo {
 	}
 
 	@Override
-	protected void enviarMsgProcessos(TipoMensagem tipoMensagem) {
-		new Thread(new BroadcastSend(new Mensagem(this.pid, this.portaUnicast, tipoMensagem))).start();
+	protected void enviarMsgProcessos(Mensagem mensagem) {
+		new Thread(new BroadcastSend(mensagem)).start();
 	}
 
 }
