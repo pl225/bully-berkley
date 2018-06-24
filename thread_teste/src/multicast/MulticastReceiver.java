@@ -37,7 +37,7 @@ public class MulticastReceiver extends Multicast {
 	        Mensagem mensagem = (Mensagem) ois.readObject();
 	
 	        if (mensagem.getPidOrigem() != this.processo.getId()) {
-	        	System.out.println("Processo " + this.processo + " received multicast packet: " + mensagem + " from: " + packet.getAddress());
+	        	System.out.println("Processo " + this.processo.getId() + " received multicast packet: " + mensagem + " from: " + packet.getAddress());
 		        this.processo.executarAlgoritmo(mensagem);
 		    }
 	
